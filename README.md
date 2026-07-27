@@ -1,6 +1,6 @@
 # dx-k8s-device-plugin
 
-Kubernetes device plugin for DEEPX DX-M1 NPUs. Advertises `deepx.ai/npu`, injects
+Kubernetes device plugin for DEEPX DX-M1 NPUs. Advertises `deepx.ai/dx-m1`, injects
 NPU device nodes into pods via CDI. Kernel driver + firmware are a **host
 prerequisite** (installed by `dx-runtime/install.sh`); this plugin only discovers,
 health-checks, and schedules the cards.
@@ -28,7 +28,7 @@ kubelet-restart handling (P4), multi-arch image + CI (P5).
 | Device node | `/dev/dxrtN` (one per card, char major 507) |
 | Enumeration | `ls /sys/class/dxrt/` |
 | Metadata/health | `dxrt-cli -s [-d N]` |
-| Resource | `deepx.ai/npu` (whole-device) |
+| Resource | `deepx.ai/dx-m1` (whole-device) |
 
 ## Test
 

@@ -1,0 +1,55 @@
+# Raw DaemonSet for dev/testing. Production deploys via the dx-npu Helm chart in
+# dx-all-suite (adds NFD gating + tighter securityContext). Prereq on each node:
+# host driver+firmware+runtime installed (dx-runtime/install.sh) and k3s/containerd
+# CDI enabled (enable_cdi=true, cdi_spec_dirs include /etc/cdi).
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dx-m1-device-plugin
+  namespace: kube-system
+  labels:
+    app: dx-m1-device-plugin
+spec:
+  selector:
+    matchLabels:
+      app: dx-m1-device-plugin
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: dx-m1-device-plugin
+    spec:
+      priorityClassName: system-node-critical
+      # Once the suite NFD rule is deployed, gate to NPU nodes:
+      # nodeSelector:
+      #   deepx.ai/dx-m1.present: "true"
+      containers:
+        - name: dx-device-plugin
+          image: ghcr.io/deepx-sangminkang/dx-k8s-device-plugin:latest
+          imagePullPolicy: Always
+          env:
+            # dxrt-cli + libs are mounted from the host /usr/local below.
+            - name: PATH
+              value: /usr/local/bin:/usr/bin:/bin
+            - name: LD_LIBRARY_PATH
+              value: /usr/local/lib
+          securityContext:
+            # Broad for dev: the plugin opens /dev/dxrtN via dxrt-cli for health.
+            # The Helm chart narrows this to the specific device + cgroup rules.
+            privileged: true
+          volumeMounts:
+            - { name: device-plugin, mountPath: /var/lib/kubelet/device-plugins }
+            - { name: cdi, mountPath: /etc/cdi }
+            - { name: dev, mountPath: /dev }
+            - { name: sys, mountPath: /sys, readOnly: true }
+            - { name: usrlocal, mountPath: /usr/local, readOnly: true }
+      volumes:
+        - { name: device-plugin, hostPath: { path: /var/lib/kubelet/device-plugins, type: Directory } }
+        - { name: cdi, hostPath: { path: /etc/cdi, type: DirectoryOrCreate } }
+        - { name: dev, hostPath: { path: /dev, type: Directory } }
+        - { name: sys, hostPath: { path: /sys, type: Directory } }
+        - { name: usrlocal, hostPath: { path: /usr/local, type: Directory } }
+      tolerations:
+        - { key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule }
+        - { key: node-role.kubernetes.io/master, operator: Exists, effect: NoSchedule }

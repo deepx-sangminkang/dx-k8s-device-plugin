@@ -10,15 +10,33 @@ submodule; deployed via the `dx-npu` Helm chart there.
 
 ## Status
 
-Under construction. Implemented so far:
+Core plugin complete; suite-side Helm chart / NFD / metrics still pending.
 
-- **`internal/dxdevice`** (P1) — shared enumeration + health package. sysfs
+- **`internal/dxdevice`** (P1) — shared enumeration + health. sysfs
   (`/sys/class/dxrt/dxrtN`) is authoritative for the allocatable card list;
   `dxrt-cli -s` supplies metadata (product, RT/PCIe driver, firmware, PCIe BDF)
   and health.
+- **`internal/cdi`** (P2) — CDI 0.6.0 spec generation (`/etc/cdi/deepx.json`):
+  one CDI device per card + optional host runtime-lib mounts for thin images.
+- **`internal/plugin`** (P3) — kubelet Device Plugin API: `ListAndWatch`
+  (health-aware) + `Allocate` (CDI dual-path: typed `CDIDevices` + legacy annotation).
+- **`internal/monitor` + `cmd/dx-device-plugin`** (P4) — CDI regen loop, gRPC
+  server, kubelet registration, re-register on kubelet restart (fsnotify).
+- **Dockerfile + CI + `deploy/`** (P5) — multi-arch image → ghcr, raw DaemonSet
+  and smoke-test pod.
 
-Planned: CDI generator (P2), device-plugin gRPC server (P3), lifecycle +
-kubelet-restart handling (P4), multi-arch image + CI (P5).
+Planned (in `dx-all-suite`): `dx-npu` Helm chart, NFD rule (PCI `1ff4` → labels),
+optional `deepx_npu_*` metrics exporter.
+
+## Deploy (dev)
+
+```bash
+# each NPU node, host: driver + firmware + runtime
+cd dx-runtime && ./install.sh --runtime-only
+# enable CDI in k3s containerd (enable_cdi=true, cdi_spec_dirs incl /etc/cdi), then:
+kubectl apply -f deploy/dx-device-plugin.yaml
+kubectl apply -f deploy/test-pod.yaml && kubectl logs dx-m1-test
+```
 
 ## Facts (DX-M1, verified on hardware)
 

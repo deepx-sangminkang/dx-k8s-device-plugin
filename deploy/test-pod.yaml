@@ -1,0 +1,20 @@
+# Smoke test: requests one DX-M1 NPU. With the device plugin + CDI in place, the
+# pod should see /dev/dxrt0 and (via CDI lib mounts) be able to run dxrt-cli.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dx-m1-test
+spec:
+  restartPolicy: Never
+  containers:
+    - name: probe
+      image: debian:bookworm-slim
+      command: ["/bin/bash", "-c"]
+      args:
+        - |
+          echo "=== /dev/dxrt* ===";  ls -l /dev/dxrt* || echo "no NPU device injected"
+          echo "=== dxrt-cli -s ==="; LD_LIBRARY_PATH=/usr/local/lib /usr/local/bin/dxrt-cli -s || echo "dxrt-cli unavailable"
+          sleep 120
+      resources:
+        limits:
+          deepx.ai/dx-m1: 1

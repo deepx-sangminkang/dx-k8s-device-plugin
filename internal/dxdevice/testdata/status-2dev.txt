@@ -1,0 +1,30 @@
+DXRT v3.4.0+fad14d6
+=======================================================
+ * Device 0: M1, Accelerator type
+---------------------   Version   ---------------------
+ * RT Driver version   : v2.5.1
+ * PCIe Driver version : v2.4.1
+-------------------------------------------------------
+ * FW version          : v2.7.3
+--------------------- Device Info ---------------------
+ * Memory : LPDDR5x 6000 Mbps, 3.92GiB
+ * Board  : M.2, Rev 1.0
+ * Chip Offset : 0
+ * PCIe   : Gen3 X4 [85:00:00]
+
+NPU 0: voltage 750 mV, clock 1000 MHz, temperature 43'C
+=======================================================
+ * Device 1: M1, Accelerator type
+---------------------   Version   ---------------------
+ * RT Driver version   : v2.5.1
+ * PCIe Driver version : v2.4.1
+-------------------------------------------------------
+ * FW version          : v2.7.3
+--------------------- Device Info ---------------------
+ * Memory : LPDDR5x 6000 Mbps, 3.92GiB
+ * Board  : M.2, Rev 1.0
+ * Chip Offset : 0
+ * PCIe   : Gen3 X4 [86:00:00]
+
+NPU 0: voltage 750 mV, clock 1000 MHz, temperature 41'C
+=======================================================

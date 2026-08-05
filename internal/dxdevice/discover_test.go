@@ -2,7 +2,9 @@ package dxdevice
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
+	"reflect"
 	"testing"
 )
 
@@ -25,10 +27,29 @@ func TestParseStatus_OneDevice(t *testing.T) {
 		ID: 0, Name: "dxrt0", NodePath: "/dev/dxrt0",
 		Product: "M1", RTDriver: "v2.5.1", PCIeDriver: "v2.4.1",
 		FWVersion: "v2.7.3", Board: "M.2, Rev 1.0", PCIe: "Gen3 X4 [85:00:00]",
+		Cores: []Core{
+			{ID: 0, TemperatureC: 43, VoltageMV: 750, ClockMHz: 1000},
+			{ID: 1, TemperatureC: 42, VoltageMV: 750, ClockMHz: 1000},
+			{ID: 2, TemperatureC: 43, VoltageMV: 750, ClockMHz: 1000},
+		},
 		Healthy: true,
 	}
-	if d != want {
+	if !reflect.DeepEqual(d, want) {
 		t.Errorf("device 0 mismatch:\n got  %+v\n want %+v", d, want)
+	}
+}
+
+// Per-core stats come from the `NPU N: voltage .. mV, clock .. MHz,
+// temperature ..'C` line in each device block.
+func TestParseStatus_Cores(t *testing.T) {
+	devs := parseStatus(readFixture(t, "status-2dev.txt"))
+	want0 := []Core{{ID: 0, TemperatureC: 43, VoltageMV: 750, ClockMHz: 1000}}
+	want1 := []Core{{ID: 0, TemperatureC: 41, VoltageMV: 750, ClockMHz: 1000}}
+	if !reflect.DeepEqual(devs[0].Cores, want0) {
+		t.Errorf("device 0 cores = %+v, want %+v", devs[0].Cores, want0)
+	}
+	if !reflect.DeepEqual(devs[1].Cores, want1) {
+		t.Errorf("device 1 cores = %+v, want %+v", devs[1].Cores, want1)
 	}
 }
 
@@ -100,6 +121,12 @@ func TestHealth(t *testing.T) {
 func TestList_RealHardware(t *testing.T) {
 	if _, err := os.Stat(sysClassDxrt); err != nil {
 		t.Skipf("no %s on this host, skipping real-hardware test", sysClassDxrt)
+	}
+	// Containers see the host's /sys but usually lack the DEEPX userland;
+	// without dxrt-cli every card parses as Unhealthy, which is an environment
+	// gap, not a plugin bug.
+	if _, err := exec.LookPath("dxrt-cli"); err != nil {
+		t.Skip("dxrt-cli not in PATH, skipping real-hardware test")
 	}
 	devs, err := List()
 	if err != nil {

@@ -30,6 +30,7 @@ var (
 var (
 	reDxrtName  = regexp.MustCompile(`^dxrt(\d+)$`)
 	reDevHeader = regexp.MustCompile(`^\s*\*\s*Device\s+(\d+):\s*([^,]+)`)
+	reCoreLine  = regexp.MustCompile(`^\s*NPU\s+(\d+):\s*voltage\s+(\d+)\s*mV,\s*clock\s+(\d+)\s*MHz,\s*temperature\s+(-?\d+)'C`)
 )
 
 // List enumerates the NPU cards on this host. sysfs is authoritative for which
@@ -81,6 +82,12 @@ func listSysfs() ([]string, error) {
 	return names, nil
 }
 
+// atoi converts regex-captured digits; the pattern guarantees a valid int.
+func atoi(s string) int {
+	n, _ := strconv.Atoi(s)
+	return n
+}
+
 func idFromName(name string) int {
 	m := reDxrtName.FindStringSubmatch(name)
 	if m == nil {
@@ -111,6 +118,17 @@ func parseStatus(out string) map[int]Device {
 			continue
 		}
 		if curID < 0 {
+			continue
+		}
+		if m := reCoreLine.FindStringSubmatch(ln); m != nil {
+			d := devs[curID]
+			d.Cores = append(d.Cores, Core{
+				ID:           atoi(m[1]),
+				VoltageMV:    atoi(m[2]),
+				ClockMHz:     atoi(m[3]),
+				TemperatureC: atoi(m[4]),
+			})
+			devs[curID] = d
 			continue
 		}
 		key, val, ok := splitKV(ln)

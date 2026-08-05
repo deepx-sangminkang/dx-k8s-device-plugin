@@ -26,9 +26,22 @@ type Device struct {
 	Board      string // "M.2, Rev 1.0"
 	PCIe       string // "Gen3 X4 [85:00:00]" (BDF used as stable identity)
 
+	// Cores holds per-core telemetry (NPU 0/1/2 lines from dxrt-cli), consumed
+	// by the metrics exporter. Not part of scheduling decisions.
+	Cores []Core
+
 	// Healthy is true when the card is present in sysfs AND dxrt-cli reports a
 	// status block for it. A card that exists in sysfs but is missing from
 	// dxrt-cli output (wedged/recovering) is reported Unhealthy so the device
 	// plugin stops scheduling onto it.
 	Healthy bool
+}
+
+// Core is one internal NPU core's telemetry from a `NPU N: voltage .. mV,
+// clock .. MHz, temperature ..'C` status line.
+type Core struct {
+	ID           int
+	TemperatureC int
+	VoltageMV    int
+	ClockMHz     int
 }

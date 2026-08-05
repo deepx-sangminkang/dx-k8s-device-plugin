@@ -9,6 +9,7 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 	"os/signal"
 	"path/filepath"
 	"syscall"
@@ -17,6 +18,8 @@ import (
 	"github.com/fsnotify/fsnotify"
 
 	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/cdi"
+	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/dxdevice"
+	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/metrics"
 	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/monitor"
 	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/plugin"
 )
@@ -38,6 +41,16 @@ func main() {
 	// CDI monitor: keep /etc/cdi/deepx.json current for containerd.
 	mon := &monitor.Monitor{CDIDir: cdiDir, Libs: cdi.DefaultLibs, Interval: 60 * time.Second}
 	go mon.Run(ctx)
+
+	// Prometheus metrics (deepx_npu_*), enabled when METRICS_ADDR is set.
+	if addr := os.Getenv("METRICS_ADDR"); addr != "" {
+		go func() {
+			log.Printf("serving metrics on %s", addr)
+			if err := metrics.Serve(addr, dxdevice.List); err != nil {
+				log.Printf("metrics server: %v", err)
+			}
+		}()
+	}
 
 	// Device-plugin server, (re)registered with kubelet.
 	if err := serveAndRegister(ctx); err != nil {

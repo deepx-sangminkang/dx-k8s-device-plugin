@@ -11,23 +11,26 @@ import (
 
 	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/cdi"
 	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/dxdevice"
+	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/nfd"
 )
 
 // Seams overridden in tests.
 var (
-	listFunc  = dxdevice.List
-	writeFunc = cdi.Write
+	listFunc     = dxdevice.List
+	writeFunc    = cdi.Write
+	nfdWriteFunc = nfd.Write
 )
 
 // Monitor regenerates the CDI spec for the node's NPUs.
 type Monitor struct {
-	CDIDir   string        // where deepx.json is written, e.g. /etc/cdi
-	Libs     []string      // host runtime libs to inject (cdi.DefaultLibs, or nil for thin)
-	Interval time.Duration // re-scan period
+	CDIDir     string        // where deepx.json is written, e.g. /etc/cdi
+	FeatureDir string        // NFD features.d dir for version labels; "" disables
+	Libs       []string      // host runtime libs to inject (cdi.DefaultLibs, or nil for thin)
+	Interval   time.Duration // re-scan period
 }
 
-// Regenerate enumerates once and rewrites the CDI spec. Returns the device
-// count so callers can log it.
+// Regenerate enumerates once and rewrites the CDI spec (plus the NFD feature
+// file when FeatureDir is set). Returns the device count so callers can log it.
 func (m *Monitor) Regenerate() (int, error) {
 	devs, err := listFunc()
 	if err != nil {
@@ -36,6 +39,11 @@ func (m *Monitor) Regenerate() (int, error) {
 	spec := cdi.Generate(devs, m.Libs)
 	if err := writeFunc(spec, m.CDIDir); err != nil {
 		return 0, err
+	}
+	if m.FeatureDir != "" {
+		if err := nfdWriteFunc(devs, m.FeatureDir); err != nil {
+			return 0, err
+		}
 	}
 	return len(devs), nil
 }

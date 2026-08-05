@@ -38,8 +38,14 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	// CDI monitor: keep /etc/cdi/deepx.json current for containerd.
-	mon := &monitor.Monitor{CDIDir: cdiDir, Libs: cdi.DefaultLibs, Interval: 60 * time.Second}
+	// CDI monitor: keep /etc/cdi/deepx.json current for containerd, and the
+	// NFD feature file (fw/driver labels) when NFD_FEATURE_DIR is set.
+	mon := &monitor.Monitor{
+		CDIDir:     cdiDir,
+		FeatureDir: os.Getenv("NFD_FEATURE_DIR"),
+		Libs:       cdi.DefaultLibs,
+		Interval:   60 * time.Second,
+	}
 	go mon.Run(ctx)
 
 	// Prometheus metrics (deepx_npu_*), enabled when METRICS_ADDR is set.

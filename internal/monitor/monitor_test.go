@@ -48,6 +48,36 @@ func TestRegenerate_WritesSpec(t *testing.T) {
 	}
 }
 
+// FeatureDir set → the NFD feature file is written alongside the CDI spec;
+// unset → skipped entirely.
+func TestRegenerate_FeatureFile(t *testing.T) {
+	swap(t, &listFunc, func() ([]dxdevice.Device, error) {
+		return []dxdevice.Device{{ID: 0, Name: "dxrt0", FWVersion: "v2.7.3"}}, nil
+	})
+	var gotDir string
+	swap(t, &nfdWriteFunc, func(devs []dxdevice.Device, dir string) error {
+		gotDir = dir
+		return nil
+	})
+
+	m := &Monitor{CDIDir: t.TempDir(), FeatureDir: "/features.d"}
+	if _, err := m.Regenerate(); err != nil {
+		t.Fatalf("Regenerate: %v", err)
+	}
+	if gotDir != "/features.d" {
+		t.Errorf("nfd write dir = %q, want /features.d", gotDir)
+	}
+
+	gotDir = ""
+	m.FeatureDir = ""
+	if _, err := m.Regenerate(); err != nil {
+		t.Fatalf("Regenerate (no feature dir): %v", err)
+	}
+	if gotDir != "" {
+		t.Error("feature file must not be written when FeatureDir is empty")
+	}
+}
+
 func TestRegenerate_EnumErrorPropagates(t *testing.T) {
 	swap(t, &listFunc, func() ([]dxdevice.Device, error) {
 		return nil, errors.New("boom")

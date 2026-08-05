@@ -33,6 +33,9 @@ const specVersion = "0.6.0"
 var DefaultLibs = []string{
 	"/usr/local/lib/libdxrt.so.3",
 	"/usr/local/lib/libonnxruntime.so.1",
+	// dxrt-cli rides along for in-pod diagnostics, the way nvidia-ctk
+	// injects nvidia-smi.
+	"/usr/local/bin/dxrt-cli",
 }
 
 // Spec is the subset of the CDI schema we produce.

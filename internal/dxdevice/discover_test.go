@@ -98,6 +98,9 @@ func TestList_MergesSysfsAndStatus(t *testing.T) {
 	if !devs[0].Healthy || devs[0].FWVersion != "v2.7.3" {
 		t.Errorf("dxrt0 should be healthy+enriched, got %+v", devs[0])
 	}
+	if len(devs[0].Cores) != 3 {
+		t.Errorf("dxrt0 cores not merged from status, got %+v", devs[0].Cores)
+	}
 	if devs[1].Healthy {
 		t.Errorf("dxrt1 absent from status must be Unhealthy, got %+v", devs[1])
 	}

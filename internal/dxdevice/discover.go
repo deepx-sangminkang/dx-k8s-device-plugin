@@ -59,6 +59,7 @@ func List() ([]Device, error) {
 			d.FWVersion = m.FWVersion
 			d.Board = m.Board
 			d.PCIe = m.PCIe
+			d.Cores = m.Cores
 			d.Healthy = true
 		}
 		devs = append(devs, d)

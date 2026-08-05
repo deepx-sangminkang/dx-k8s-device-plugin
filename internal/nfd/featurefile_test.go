@@ -18,6 +18,14 @@ func TestWrite_LabelsFromDevices(t *testing.T) {
 	if err := Write(devs, dir); err != nil {
 		t.Fatal(err)
 	}
+	fi, err := os.Stat(filepath.Join(dir, FileName))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// NFD worker runs as another user; 0600 (CreateTemp default) breaks it.
+	if fi.Mode().Perm() != 0o644 {
+		t.Errorf("feature file mode = %o, want 644", fi.Mode().Perm())
+	}
 	b, err := os.ReadFile(filepath.Join(dir, FileName))
 	if err != nil {
 		t.Fatal(err)

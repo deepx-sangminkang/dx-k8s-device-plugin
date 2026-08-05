@@ -42,6 +42,13 @@ func Write(devs []dxdevice.Device, dir string) error {
 		return err
 	}
 	name := tmp.Name()
+	// CreateTemp defaults to 0600; the NFD worker runs as a different user and
+	// must be able to read the file.
+	if err := tmp.Chmod(0o644); err != nil {
+		tmp.Close()
+		os.Remove(name)
+		return err
+	}
 	if _, err := tmp.WriteString(b.String()); err != nil {
 		tmp.Close()
 		os.Remove(name)

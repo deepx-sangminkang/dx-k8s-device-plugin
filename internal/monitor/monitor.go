@@ -9,9 +9,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/cdi"
-	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/dxdevice"
-	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/nfd"
+	"github.com/DEEPX-AI/dx-k8s-device-plugin/internal/cdi"
+	"github.com/DEEPX-AI/dx-k8s-device-plugin/internal/dxdevice"
+	"github.com/DEEPX-AI/dx-k8s-device-plugin/internal/nfd"
 )
 
 // Seams overridden in tests.

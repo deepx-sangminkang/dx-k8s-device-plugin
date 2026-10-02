@@ -10,7 +10,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/dxdevice"
+	"github.com/DEEPX-AI/dx-k8s-device-plugin/internal/dxdevice"
 )
 
 // ListFunc supplies the current device list; dxdevice.List in production.
@@ -35,7 +35,7 @@ func NewHandler(list ListFunc) http.Handler {
 		up: prometheus.NewDesc("deepx_npu_up",
 			"1 when NPU enumeration succeeds on this node.", nil, nil),
 		healthy: prometheus.NewDesc("deepx_npu_device_healthy",
-			"1 when the card is healthy (present in sysfs and dxrt-cli).",
+			"1 when the card is healthy (present in sysfs and dxcli).",
 			[]string{"device", "model", "pcie"}, nil),
 		coreTemp: prometheus.NewDesc("deepx_npu_core_temperature_celsius",
 			"Per-core temperature.", coreLabels, nil),

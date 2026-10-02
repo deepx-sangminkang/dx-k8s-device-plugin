@@ -15,14 +15,14 @@ var (
 	// sysClassDxrt is the sysfs class dir the driver creates one entry per card in.
 	sysClassDxrt = "/sys/class/dxrt"
 
-	// statusCmd runs `dxrt-cli -s` (all devices when id < 0, else `-d <id>`) and
+	// statusCmd runs `dxcli -s` (all devices when id < 0, else `-d <id>`) and
 	// returns its combined stdout+stderr. Tests override it with a fixture.
 	statusCmd = func(id int) (string, error) {
 		args := []string{"-s"}
 		if id >= 0 {
 			args = append(args, "-d", strconv.Itoa(id))
 		}
-		out, err := exec.Command("dxrt-cli", args...).CombinedOutput()
+		out, err := exec.Command("dxcli", args...).CombinedOutput()
 		return string(out), err
 	}
 )
@@ -34,8 +34,8 @@ var (
 )
 
 // List enumerates the NPU cards on this host. sysfs is authoritative for which
-// cards exist (and thus the allocatable count); dxrt-cli metadata is merged in
-// best-effort. A card present in sysfs but absent from dxrt-cli output is
+// cards exist (and thus the allocatable count); dxcli metadata is merged in
+// best-effort. A card present in sysfs but absent from dxcli output is
 // returned with Healthy=false.
 func List() ([]Device, error) {
 	names, err := listSysfs()
@@ -43,7 +43,7 @@ func List() ([]Device, error) {
 		return nil, err
 	}
 
-	// Best-effort metadata for all devices in one call. If dxrt-cli fails we
+	// Best-effort metadata for all devices in one call. If dxcli fails we
 	// still return the sysfs-discovered cards (all Unhealthy).
 	out, _ := statusCmd(-1)
 	meta := parseStatus(out)
@@ -98,7 +98,7 @@ func idFromName(name string) int {
 	return id
 }
 
-// parseStatus parses `dxrt-cli -s` output into per-device metadata keyed by ID.
+// parseStatus parses `dxcli -s` output into per-device metadata keyed by ID.
 // Each device block starts at a `* Device N:` header; key/value lines that
 // follow (until the next header) fill that device's fields.
 func parseStatus(out string) map[int]Device {

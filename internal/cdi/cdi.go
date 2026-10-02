@@ -16,7 +16,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/dxdevice"
+	"github.com/DEEPX-AI/dx-k8s-device-plugin/internal/dxdevice"
 )
 
 // Kind is the CDI kind / device-plugin resource name for DEEPX DX-M1 NPUs.
@@ -33,9 +33,9 @@ const specVersion = "0.6.0"
 var DefaultLibs = []string{
 	"/usr/local/lib/libdxrt.so.3",
 	"/usr/local/lib/libonnxruntime.so.1",
-	// dxrt-cli rides along for in-pod diagnostics, the way nvidia-ctk
+	// dxcli rides along for in-pod diagnostics, the way nvidia-ctk
 	// injects nvidia-smi.
-	"/usr/local/bin/dxrt-cli",
+	"/usr/local/bin/dxcli",
 }
 
 // Spec is the subset of the CDI schema we produce.

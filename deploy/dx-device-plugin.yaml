@@ -26,16 +26,16 @@ spec:
       #   deepx.ai/dx-m1.present: "true"
       containers:
         - name: dx-device-plugin
-          image: ghcr.io/deepx-sangminkang/dx-k8s-device-plugin:latest
+          image: ghcr.io/deepx-ai/dx-k8s-device-plugin:latest
           imagePullPolicy: Always
           env:
-            # dxrt-cli + libs are mounted from the host /usr/local below.
+            # dxcli + libs are mounted from the host /usr/local below.
             - name: PATH
               value: /usr/local/bin:/usr/bin:/bin
             - name: LD_LIBRARY_PATH
               value: /usr/local/lib
           securityContext:
-            # Broad for dev: the plugin opens /dev/dxrtN via dxrt-cli for health.
+            # Broad for dev: the plugin opens /dev/dxrtN via dxcli for health.
             # The Helm chart narrows this to the specific device + cgroup rules.
             privileged: true
           volumeMounts:

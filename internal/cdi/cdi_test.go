@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/dxdevice"
+	"github.com/DEEPX-AI/dx-k8s-device-plugin/internal/dxdevice"
 )
 
 func sampleDevices() []dxdevice.Device {

@@ -1,4 +1,4 @@
-module github.com/deepx-sangminkang/dx-k8s-device-plugin
+module github.com/DEEPX-AI/dx-k8s-device-plugin
 
 go 1.22.0
 

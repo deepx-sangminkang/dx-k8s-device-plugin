@@ -73,7 +73,7 @@ func TestParseStatus_Empty(t *testing.T) {
 	}
 }
 
-// List merges sysfs enumeration (authoritative) with dxrt-cli metadata, and
+// List merges sysfs enumeration (authoritative) with dxcli metadata, and
 // marks a sysfs-present-but-status-absent card Unhealthy.
 func TestList_MergesSysfsAndStatus(t *testing.T) {
 	dir := t.TempDir()
@@ -118,7 +118,7 @@ func TestHealth(t *testing.T) {
 	}
 }
 
-// TestList_RealHardware exercises the full path (sysfs read + real dxrt-cli exec
+// TestList_RealHardware exercises the full path (sysfs read + real dxcli exec
 // + parse) on a node that actually has a DX-M1. It skips cleanly on CI / dev
 // machines without an NPU, so it never blocks the suite.
 func TestList_RealHardware(t *testing.T) {
@@ -126,10 +126,10 @@ func TestList_RealHardware(t *testing.T) {
 		t.Skipf("no %s on this host, skipping real-hardware test", sysClassDxrt)
 	}
 	// Containers see the host's /sys but usually lack the DEEPX userland;
-	// without dxrt-cli every card parses as Unhealthy, which is an environment
+	// without dxcli every card parses as Unhealthy, which is an environment
 	// gap, not a plugin bug.
-	if _, err := exec.LookPath("dxrt-cli"); err != nil {
-		t.Skip("dxrt-cli not in PATH, skipping real-hardware test")
+	if _, err := exec.LookPath("dxcli"); err != nil {
+		t.Skip("dxcli not in PATH, skipping real-hardware test")
 	}
 	devs, err := List()
 	if err != nil {
@@ -145,7 +145,7 @@ func TestList_RealHardware(t *testing.T) {
 			t.Errorf("%s reported Unhealthy on a live node", d.Name)
 		}
 		if d.FWVersion == "" {
-			t.Errorf("%s has empty FWVersion — dxrt-cli parse likely broke", d.Name)
+			t.Errorf("%s has empty FWVersion — dxcli parse likely broke", d.Name)
 		}
 	}
 }

@@ -15,8 +15,8 @@ import (
 
 	pluginapi "k8s.io/kubelet/pkg/apis/deviceplugin/v1beta1"
 
-	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/cdi"
-	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/dxdevice"
+	"github.com/DEEPX-AI/dx-k8s-device-plugin/internal/cdi"
+	"github.com/DEEPX-AI/dx-k8s-device-plugin/internal/dxdevice"
 )
 
 // listFunc is the enumeration seam (overridden in tests). Defaults to the real host.

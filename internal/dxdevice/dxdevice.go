@@ -7,12 +7,12 @@
 // Enumeration source of truth is sysfs (/sys/class/dxrt/dxrtN) — one entry per
 // card, which is the whole-device allocation unit advertised as deepx.ai/npu.
 // Metadata (product, driver/firmware versions, PCIe BDF) and health come from
-// parsing `dxrt-cli -s`.
+// parsing `dxcli -s`.
 package dxdevice
 
 // Device is one allocatable DX-M1 NPU card (one /dev/dxrtN node).
 //
-// A single card contains multiple internal NPU cores (dxrt-cli reports "NPU 0/1/2")
+// A single card contains multiple internal NPU cores (dxcli reports "NPU 0/1/2")
 // but they are not independently schedulable — the card is allocated whole.
 type Device struct {
 	ID       int    // sysfs index, e.g. 0 for dxrt0
@@ -26,13 +26,13 @@ type Device struct {
 	Board      string // "M.2, Rev 1.0"
 	PCIe       string // "Gen3 X4 [85:00:00]" (BDF used as stable identity)
 
-	// Cores holds per-core telemetry (NPU 0/1/2 lines from dxrt-cli), consumed
+	// Cores holds per-core telemetry (NPU 0/1/2 lines from dxcli), consumed
 	// by the metrics exporter. Not part of scheduling decisions.
 	Cores []Core
 
-	// Healthy is true when the card is present in sysfs AND dxrt-cli reports a
+	// Healthy is true when the card is present in sysfs AND dxcli reports a
 	// status block for it. A card that exists in sysfs but is missing from
-	// dxrt-cli output (wedged/recovering) is reported Unhealthy so the device
+	// dxcli output (wedged/recovering) is reported Unhealthy so the device
 	// plugin stops scheduling onto it.
 	Healthy bool
 }

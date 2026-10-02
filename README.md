@@ -5,7 +5,7 @@ NPU device nodes into pods via CDI. Kernel driver + firmware are a **host
 prerequisite** (installed by `dx-runtime/install.sh`); this plugin only discovers,
 health-checks, and schedules the cards.
 
-Consumed by [`dx-all-suite`](https://github.com/deepx-sangminkang/dx-all-suite) as a
+Consumed by [`dx-all-suite`](https://github.com/DEEPX-AI/dx-all-suite) as a
 submodule; deployed via the `dx-npu` Helm chart there.
 
 ## Status
@@ -14,7 +14,7 @@ Core plugin complete; suite-side Helm chart / NFD / metrics still pending.
 
 - **`internal/dxdevice`** (P1) — shared enumeration + health. sysfs
   (`/sys/class/dxrt/dxrtN`) is authoritative for the allocatable card list;
-  `dxrt-cli -s` supplies metadata (product, RT/PCIe driver, firmware, PCIe BDF)
+  `dxcli -s` supplies metadata (product, RT/PCIe driver, firmware, PCIe BDF)
   and health.
 - **`internal/cdi`** (P2) — CDI 0.6.0 spec generation (`/etc/cdi/deepx.json`):
   one CDI device per card + optional host runtime-lib mounts for thin images.
@@ -45,7 +45,7 @@ kubectl apply -f deploy/test-pod.yaml && kubectl logs dx-m1-test
 | PCI vendor:device | `1ff4:0100` |
 | Device node | `/dev/dxrtN` (one per card, char major 507) |
 | Enumeration | `ls /sys/class/dxrt/` |
-| Metadata/health | `dxrt-cli -s [-d N]` |
+| Metadata/health | `dxcli -s [-d N]` |
 | Resource | `deepx.ai/dx-m1` (whole-device) |
 
 ## Test
@@ -54,5 +54,5 @@ kubectl apply -f deploy/test-pod.yaml && kubectl logs dx-m1-test
 go test ./...
 ```
 
-`TestList_RealHardware` runs the full sysfs+dxrt-cli path on a node with an NPU and
+`TestList_RealHardware` runs the full sysfs+dxcli path on a node with an NPU and
 skips automatically where none is present.

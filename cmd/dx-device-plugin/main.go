@@ -17,11 +17,11 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 
-	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/cdi"
-	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/dxdevice"
-	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/metrics"
-	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/monitor"
-	"github.com/deepx-sangminkang/dx-k8s-device-plugin/internal/plugin"
+	"github.com/DEEPX-AI/dx-k8s-device-plugin/internal/cdi"
+	"github.com/DEEPX-AI/dx-k8s-device-plugin/internal/dxdevice"
+	"github.com/DEEPX-AI/dx-k8s-device-plugin/internal/metrics"
+	"github.com/DEEPX-AI/dx-k8s-device-plugin/internal/monitor"
+	"github.com/DEEPX-AI/dx-k8s-device-plugin/internal/plugin"
 )
 
 const (

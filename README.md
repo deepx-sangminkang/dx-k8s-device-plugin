@@ -8,25 +8,24 @@ health-checks, and schedules the cards.
 Consumed by [`dx-all-suite`](https://github.com/DEEPX-AI/dx-all-suite) as a
 submodule; deployed via the `dx-npu` Helm chart there.
 
-## Status
+## Components
 
-Core plugin complete; suite-side Helm chart / NFD / metrics still pending.
-
-- **`internal/dxdevice`** (P1) — shared enumeration + health. sysfs
-  (`/sys/class/dxrt/dxrtN`) is authoritative for the allocatable card list;
-  `dxcli -s` supplies metadata (product, RT/PCIe driver, firmware, PCIe BDF)
-  and health.
-- **`internal/cdi`** (P2) — CDI 0.6.0 spec generation (`/etc/cdi/deepx.json`):
-  one CDI device per card + optional host runtime-lib mounts for thin images.
-- **`internal/plugin`** (P3) — kubelet Device Plugin API: `ListAndWatch`
-  (health-aware) + `Allocate` (CDI dual-path: typed `CDIDevices` + legacy annotation).
-- **`internal/monitor` + `cmd/dx-device-plugin`** (P4) — CDI regen loop, gRPC
-  server, kubelet registration, re-register on kubelet restart (fsnotify).
-- **Dockerfile + CI + `deploy/`** (P5) — multi-arch image → ghcr, raw DaemonSet
-  and smoke-test pod.
-
-Planned (in `dx-all-suite`): `dx-npu` Helm chart, NFD rule (PCI `1ff4` → labels),
-optional `deepx_npu_*` metrics exporter.
+- **`internal/dxdevice`** — enumeration + health. sysfs (`/sys/class/dxrt/dxrtN`) is
+  authoritative for the allocatable card list; `dxcli -s` supplies metadata
+  (product, RT/PCIe driver, firmware, PCIe BDF) and health.
+- **`internal/cdi`** — CDI 0.6.0 spec generation (`/etc/cdi/deepx.json`): one CDI
+  device per card, plus host runtime-lib and `dxcli` mounts so app images stay thin.
+- **`internal/plugin`** — kubelet Device Plugin API: `ListAndWatch` (health-aware)
+  and `Allocate` (CDI dual-path: typed `CDIDevices` + legacy annotation).
+- **`internal/nfd`** — node-feature-discovery local feature file, turned by the NFD
+  worker into node labels for card count, product, and firmware/driver versions.
+- **`internal/metrics`** — `deepx_npu_*` Prometheus gauges (device health, per-core
+  temperature/voltage/clock), served on `METRICS_ADDR`.
+- **`internal/monitor` + `cmd/dx-device-plugin`** — regeneration loop, gRPC server,
+  kubelet registration, re-register on kubelet restart (fsnotify).
+- **Dockerfile + CI + `deploy/`** — multi-arch image to ghcr, raw DaemonSet and
+  smoke-test pod. The runtime base image needs a glibc at least as new as the
+  host's DXRT build, or every card reports Unhealthy.
 
 ## Deploy (dev)
 
